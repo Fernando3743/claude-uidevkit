@@ -1,7 +1,7 @@
 {
   "name": "claude-uidevkit",
   "version": "0.1.0",
-  "description": "Dev-only in-app overlay: click an element (or drag a box) in your running Next.js app to bundle full context for Claude Code, then fix it with the /claude-uidevkit slash command.",
+  "description": "Dev-only in-app overlay: click an element (or drag a box) in your running Next.js app to bundle full context for Claude Code, then fix it with the /uidevkit slash command.",
   "keywords": [
     "claude",
     "claude-code",

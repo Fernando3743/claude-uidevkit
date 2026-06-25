@@ -75,8 +75,23 @@ function installCommand(pm: PackageManager, deps: string[]): string {
 function detectAppDir(root: string): { abs: string; rel: string; created: boolean } {
   if (existsSync(join(root, "src", "app"))) return { abs: join(root, "src", "app"), rel: "src/app", created: false };
   if (existsSync(join(root, "app"))) return { abs: join(root, "app"), rel: "app", created: false };
-  // Fall back to `app/` at the root and create it.
+  // Neither app dir exists yet — pick where to create one. If the project keeps
+  // its source under `src/` (the Next.js `src/` convention), scaffold `src/app`
+  // so the route lands next to the rest of the code; otherwise fall back to a
+  // root `app/`.
+  if (existsSync(join(root, "src")))
+    return { abs: join(root, "src", "app"), rel: "src/app", created: true };
   return { abs: join(root, "app"), rel: "app", created: true };
+}
+
+// Heuristic: does this look like a Pages-Router-only project? True when a
+// `pages/` (or `src/pages/`) directory exists but no App Router dir does.
+// claude-uidevkit scaffolds App-Router-only artifacts (a `route.ts`), so we want
+// to warn loudly rather than silently drop them into a Pages-Router project.
+function isPagesRouterOnly(root: string): boolean {
+  const hasAppDir = existsSync(join(root, "app")) || existsSync(join(root, "src", "app"));
+  const hasPagesDir = existsSync(join(root, "pages")) || existsSync(join(root, "src", "pages"));
+  return hasPagesDir && !hasAppDir;
 }
 
 function findLayout(appAbs: string, appRel: string): string | null {
@@ -113,9 +128,19 @@ ${bold("What init does")}
 
 function runInit() {
   const root = process.cwd();
-  const argv = process.argv.slice(2);
+  // Drop the `init` subcommand token; what remains should be flags we recognize.
+  const argv = process.argv.slice(3);
   const force = argv.includes("--force");
   const noInstall = argv.includes("--no-install");
+
+  // Warn (don't fail) on anything unrecognized so a typo like `--no-instal`
+  // doesn't silently behave as if the flag were never passed.
+  const KNOWN_FLAGS = new Set(["--force", "--no-install"]);
+  const unknown = argv.filter((a) => !KNOWN_FLAGS.has(a));
+  if (unknown.length) {
+    skip(`ignoring unknown option${unknown.length > 1 ? "s" : ""}: ${unknown.join(", ")}`);
+    note(`known flags: --force, --no-install (see --help)`);
+  }
 
   console.log(`\n${bold(cyan("claude-uidevkit"))} ${dim("· wiring up this project")}\n`);
 
@@ -124,6 +149,16 @@ function runInit() {
     note("Run this from the root of your Next.js project.");
     process.exitCode = 1;
     return;
+  }
+
+  // claude-uidevkit only works with the App Router. If the project looks
+  // Pages-Router-only, say so loudly *before* we scaffold App-Router-only files —
+  // a dim aside is too easy to miss when the route silently won't be served.
+  if (isPagesRouterOnly(root)) {
+    fail(`This looks like a Pages-Router project (pages/ found, no app/ or src/app/).`);
+    note(`claude-uidevkit requires the Next.js App Router — the route below won't be served`);
+    note(`under the Pages Router. Add an app/ (or src/app/) directory first.`);
+    console.log("");
   }
 
   const isTS = existsSync(join(root, "tsconfig.json"));
@@ -162,10 +197,15 @@ function runInit() {
   if (existing.split(/\r?\n/).some((l) => l.trim() === entry)) {
     skip(`.gitignore already ignores ${entry}`);
   } else {
-    const prefix = existing.length && !existing.endsWith("\n") ? "\n" : "";
+    // Separate our block from any prior content with a blank line — but only
+    // when there *is* prior content, so a fresh/empty .gitignore doesn't start
+    // with a stray blank line. `eol` finishes the last existing line if needed;
+    // `sep` is the visual blank line between their content and our block.
+    const eol = existing.length && !existing.endsWith("\n") ? "\n" : "";
+    const sep = existing.length ? "\n" : "";
     writeFileSync(
       gitignore,
-      `${existing}${prefix}\n# claude-uidevkit capture queue (local, regenerable)\n${entry}\n`,
+      `${existing}${eol}${sep}# claude-uidevkit capture queue (local, regenerable)\n${entry}\n`,
     );
     ok(`.gitignore: ignored ${entry}`);
   }

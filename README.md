@@ -57,10 +57,10 @@ That's it. Start your dev server and you'll see the 🐛 / ⬚ controls in the c
 
 ## Usage
 
-| Mode        | Trigger                          | What it does                                      |
+| Mode        | Trigger                          | What it does                                       |
 | ----------- | -------------------------------- | ------------------------------------------------- |
-| **Element** | 🐛 button or `⌘/Ctrl+Shift+E`    | Hover-highlight one element, click to pick it     |
-| **Area**    | ⬚ button or `⌘/Ctrl+Shift+S`     | Drag a box over a region of the page              |
+| **Element** | 🐛 button or `⌘/Ctrl+Shift+E`    | Highlight one element, click or tap to pick it    |
+| **Area**    | ⬚ button or `⌘/Ctrl+Shift+S`     | Drag (mouse or finger) a box over a region        |
 
 After you pick, type what Claude should change and press **Send to Claude** (`⌘/Ctrl+⏎`).
 Capture as many issues as you like — each is appended to the queue — then run:
@@ -88,8 +88,10 @@ The component takes optional props:
 ```
 
 - **`position`** — move the controls if they collide with an app FAB (chat widget, etc.).
-- **`endpoint`** — the API route the overlay POSTs to. Change it on both ends if you
-  relocate the route.
+- **`endpoint`** — the API route the overlay POSTs to. If you relocate the route, the
+  App Router folder path is the source of truth: rename the `app/api/<name>/` folder
+  (e.g. `app/api/<name>/route.ts`) and set `endpoint` to the matching `/api/<name>`
+  path so the two line up.
 - **`frameworkComponentNames`** — your own wrapper components to flag as framework
   (so your real components surface first in the captured owner chain).
 
@@ -126,11 +128,20 @@ The route accepts requests from `localhost`, loopback IPs, and `*.ngrok(-free).(
 out of the box — so you can run your dev server through an ngrok tunnel and capture
 straight from your phone. Add more hosts via `createUIDevkitRoute({ extraHosts })`.
 
+Both capture modes work with touch: the overlay uses Pointer Events, so on a phone you
+**tap** an element to pick it (Element mode) or **drag** a box over a region (Area mode),
+the same as with a mouse on desktop.
+
 ## Requirements
 
 - Next.js App Router (`>=14`)
 - React `>=18` (the owner-chain walk is richest on React 19)
-- `html-to-image` (installed automatically by `init`)
+
+### Optional
+
+- `html-to-image` — enables the in-browser screenshot. It's an **optional** peer
+  dependency (`init` installs it for you). Captures still work without it — you just
+  get the context bundle (owner chain, DOM, styles, console) with no `screenshot.png`.
 
 ## Caveats
 
@@ -148,7 +159,12 @@ file-write sink:
    tree-shaken out of prod).
 2. The route returns `404` when `NODE_ENV === "production"`.
 3. The route rejects any request whose `Host` isn't loopback / an allow-listed tunnel.
-4. Request bodies are capped (25 MB by default).
+4. The route rejects cross-origin writes: it requires `Sec-Fetch-Site: same-origin`
+   (falling back to an `Origin`/`Host` host match), so another site you happen to have
+   open can't drive-by POST captures into your queue.
+5. Request bodies are capped in bytes **before** parsing (25 MB by default), embedded
+   images are validated by magic bytes and capped separately, and the queue is bounded
+   so a flood can't fill the disk.
 
 ## License
 

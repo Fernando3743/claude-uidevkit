@@ -5,8 +5,9 @@ description: Process the queued claude-uidevkit captures (clicked element + note
 The user flagged one or more spots in the running app with the in-page **claude-uidevkit**
 overlay — either by clicking a single element or by dragging a box over an area. Each
 capture is a context bundle written to its own folder under `.claude/claude-uidevkit/queue/<id>/`
-(containing `meta.json`, a `screenshot.png`, and — for area captures — a cropped
-`region.png`). Fix every queued capture in order, then delete each as you finish it.
+(containing `meta.json`, a `screenshot.png`, and — for area captures, when the crop
+succeeds — a cropped `region.png`). Fix every queued capture in order, then delete each
+as you finish it.
 
 Do this:
 
@@ -36,12 +37,19 @@ Do this:
         exact JSX within the file.
       - `renderStack` — raw React render frames (bundled URLs); secondary hint only.
 
-      **If `mode` is `"region"`:** read `<id>/region.png` (a crop of just the selected
-      area) and `<id>/screenshot.png` (the full page with the area outlined in amber).
+      **If `mode` is `"region"`:** read `<id>/region.png` if present (a crop of just the
+      selected area) and `<id>/screenshot.png` (the full page with the area outlined in
+      amber). If `region.png` is missing (`regionImage` can be null when the crop fails),
+      fall back to `screenshot.png` plus the `region` coords below to locate the area.
       Then use:
-      - `elementsInRegion` — the deduped components/elements whose boxes intersect the
-        selection, each with its `componentChain` (grep the first `framework:false` name)
-        and `selector`. These are the files to change for this area.
+      - `elementsInRegion` — a **sampled** set of visible components in the selection: the
+        topmost element hit-tested at a 6×5 grid of points across the box, deduped, capped
+        at 12. It's likely the main files to change for this area, but it is **not
+        exhaustive** — small or occluded elements between sample points are omitted, so
+        don't treat it as every component in the box. Each entry carries its
+        `componentChain` (grep the first `framework:false` name) and `selector`. For
+        anything not listed, lean on the images (`region.png` / `screenshot.png`) plus
+        `url`/`path` to find the source.
       - `region` — the box's pixel coords `{x,y,w,h}`, for cross-referencing the images.
       The instruction may span several of those components — apply it across them.
 
