@@ -14,7 +14,7 @@
 // screenshot (region mode adds a cropped close-up). It's POSTed to the API route
 // (default /api/claude-uidevkit), which appends it as a new entry under
 // `.claude/claude-uidevkit/queue/`. Capture as many as you like, then run
-// `/claude-uidevkit` in Claude Code to fix them all (each entry deleted as it's handled).
+// `/uidevkit` in Claude Code to fix them all (each entry deleted as it's handled).
 //
 // Why owner chain, not file:line — React 19 removed fiber `_debugSource`. The
 // `_debugOwner` walk still yields real component names (e.g. "Topbar"), which is a
@@ -430,7 +430,7 @@ export function ClaudeUIDevkit({
           const comp = bundle.componentChain.find((c) => !c.framework)?.name ?? bundle.target.tag;
           const n = json.count ?? 1;
           flash(
-            `Captured ${comp}${screenshot ? "" : " (no screenshot)"} → ${n} queued. Run /claude-uidevkit`,
+            `Captured ${comp}${screenshot ? "" : " (no screenshot)"} → ${n} queued. Run /uidevkit`,
           );
         } else {
           flash(`Save failed: ${json.error ?? "unknown"}`, false);
@@ -497,7 +497,7 @@ export function ClaudeUIDevkit({
         const json = await res.json();
         if (json.ok) {
           const n = json.count ?? 1;
-          flash(`Captured area (${elementsInRegion.length} comps) → ${n} queued. Run /claude-uidevkit`);
+          flash(`Captured area (${elementsInRegion.length} comps) → ${n} queued. Run /uidevkit`);
         } else {
           flash(`Save failed: ${json.error ?? "unknown"}`, false);
         }

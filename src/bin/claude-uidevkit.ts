@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // claude-uidevkit CLI — `npx claude-uidevkit init` wires a Next.js App Router project
-// up in one shot: scaffolds the API route, installs the /claude-uidevkit slash
+// up in one shot: scaffolds the API route, installs the /uidevkit slash
 // command, adds the .gitignore entry, installs deps, and prints the layout mount
 // snippet. Zero runtime dependencies — Node built-ins only.
 
@@ -25,7 +25,7 @@ function resolveTemplatesDir(): string {
   let dir = HERE;
   for (let i = 0; i < 6; i++) {
     const candidate = join(dir, "templates");
-    if (existsSync(join(candidate, "claude-uidevkit.md"))) return candidate;
+    if (existsSync(join(candidate, "route.ts.tmpl"))) return candidate;
     const parent = dirname(dir);
     if (parent === dir) break;
     dir = parent;
@@ -104,7 +104,7 @@ ${bold("Options")}
 
 ${bold("What init does")}
   • creates <app>/api/claude-uidevkit/route.ts   (re-exports the capture handler)
-  • adds .claude/commands/claude-uidevkit.md      (the /claude-uidevkit command)
+  • adds .claude/commands/uidevkit.md             (the /uidevkit command)
   • appends .claude/claude-uidevkit/ to .gitignore
   • installs claude-uidevkit + html-to-image as devDependencies
   • prints the one-line <ClaudeUIDevkit/> mount to add to your layout
@@ -146,13 +146,13 @@ function runInit() {
 
   // 2. Slash command ─────────────────────────────────────────────────────────────
   const commandsDir = join(root, ".claude", "commands");
-  const commandFile = join(commandsDir, "claude-uidevkit.md");
+  const commandFile = join(commandsDir, "uidevkit.md");
   if (existsSync(commandFile) && !force) {
     skip(`slash command exists, left as-is: ${relative(root, commandFile)} ${dim("(--force to overwrite)")}`);
   } else {
     ensureDir(commandsDir);
-    copyFileSync(join(TEMPLATES, "claude-uidevkit.md"), commandFile);
-    ok(`slash command: ${relative(root, commandFile)} ${dim("(run /claude-uidevkit)")}`);
+    copyFileSync(join(TEMPLATES, "uidevkit.md"), commandFile);
+    ok(`slash command: ${relative(root, commandFile)} ${dim("(run /uidevkit)")}`);
   }
 
   // 3. .gitignore ────────────────────────────────────────────────────────────────
@@ -209,7 +209,7 @@ function runInit() {
   console.log(`${bold(green("Done."))} Next:`);
   note(`1. add the mount line above to your layout`);
   note(`2. start your dev server, then click 🐛 Element / ⬚ Area (bottom-right)`);
-  note(`3. type what to change → Send → run ${cyan("/claude-uidevkit")} in Claude Code`);
+  note(`3. type what to change → Send → run ${cyan("/uidevkit")} in Claude Code`);
   console.log("");
 }
 

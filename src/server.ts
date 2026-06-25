@@ -8,7 +8,7 @@ import path from "node:path";
 // Receives the context bundle the in-page <ClaudeUIDevkit/> overlay assembles when
 // you click an element, and APPENDS it as a new entry under
 // `.claude/claude-uidevkit/queue/` so you can capture several issues and fix them in
-// one `/claude-uidevkit` run (which deletes each entry as it's handled). Folder is
+// one `/uidevkit` run (which deletes each entry as it's handled). Folder is
 // `claude-uidevkit`, not `_claude-uidevkit` — a leading underscore is a Next.js
 // private folder, excluded from routing.
 //
@@ -32,7 +32,7 @@ export type UIDevkitRouteOptions = {
   /**
    * Directory capture folders are written to. Default
    * `.claude/claude-uidevkit/queue` under `process.cwd()` (the repo root under
-   * `next dev`). The `/claude-uidevkit` slash command reads from this same path.
+   * `next dev`). The `/uidevkit` slash command reads from this same path.
    */
   queueDir?: string;
   /** Max accepted request body size, in bytes. Default 25 MB. */

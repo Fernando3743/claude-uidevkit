@@ -6,7 +6,7 @@ A dev-only, in-page overlay for **Next.js App Router** apps. When something look
 wrong in the browser, you point at it, type what you want changed, and hit send. The
 overlay captures a rich context bundle — the React owner-component chain, DOM +
 computed styles, recent console errors, and an in-browser screenshot — and queues it
-on disk. Then you run the `/claude-uidevkit` slash command in Claude Code and it fixes
+on disk. Then you run the `/uidevkit` slash command in Claude Code and it fixes
 every queued capture, citing the `file:line` it changed.
 
 It never ships to production: the overlay is mounted behind a `NODE_ENV` guard (so
@@ -24,7 +24,7 @@ npx claude-uidevkit init
 That one command:
 
 - creates `app/api/claude-uidevkit/route.ts` (re-exports the capture handler)
-- adds `.claude/commands/claude-uidevkit.md` (the `/claude-uidevkit` command)
+- adds `.claude/commands/uidevkit.md` (the `/uidevkit` command)
 - appends `.claude/claude-uidevkit/` to your `.gitignore`
 - installs `claude-uidevkit` + `html-to-image` as devDependencies
 - prints the one line to add to your root layout
@@ -66,11 +66,11 @@ After you pick, type what Claude should change and press **Send to Claude** (`�
 Capture as many issues as you like — each is appended to the queue — then run:
 
 ```
-/claude-uidevkit
+/uidevkit
 ```
 
 Claude reads each queued bundle in capture order, applies the fix, and removes the
-entry. Pass extra instructions inline, e.g. `/claude-uidevkit just tell me the files`
+entry. Pass extra instructions inline, e.g. `/uidevkit just tell me the files`
 to report without editing.
 
 `Esc` cancels pick mode or closes the note box.
@@ -117,7 +117,7 @@ export const { POST } = createUIDevkitRoute({
 - **Queue (disk).** The route writes each capture to its own folder under
   `.claude/claude-uidevkit/queue/<id>/` — a `meta.json` plus `screenshot.png` (and a
   cropped `region.png` for area captures).
-- **Fix (Claude Code).** The `/claude-uidevkit` command reads the queue in order, maps
+- **Fix (Claude Code).** The `/uidevkit` command reads the queue in order, maps
   each capture to source files, applies the change, and deletes the entry.
 
 ## Mobile / tunnel capture

@@ -15,7 +15,7 @@ Do this:
    order). If the queue is empty or missing, tell the user to capture first: use the
    🐛 Element button (⌘/Ctrl+Shift+E) to pick one element, or the ⬚ Area button
    (⌘/Ctrl+Shift+S) to drag a box over a region, type the change, **Send to Claude** —
-   repeat for as many issues as they want — then re-run `/claude-uidevkit`.
+   repeat for as many issues as they want — then re-run `/uidevkit`.
 
 2. **For each entry, in order:**
    a. Read `<id>/meta.json`. The **`instruction`** field is what the user typed into the
@@ -63,8 +63,8 @@ Do this:
    parallel; if two entries touch the same file, apply them sequentially to avoid
    conflicts.
 
-Read `$ARGUMENTS` for any extra instruction the user typed after `/claude-uidevkit` (e.g.
-`/claude-uidevkit just tell me the files`, in which case don't edit or delete — only report).
+Read `$ARGUMENTS` for any extra instruction the user typed after `/uidevkit` (e.g.
+`/uidevkit just tell me the files`, in which case don't edit or delete — only report).
 
 Note: `.claude/claude-uidevkit/` is git-ignored and dev-only; the `/api/claude-uidevkit` route and the
 `<ClaudeUIDevkit/>` overlay never ship to production.
