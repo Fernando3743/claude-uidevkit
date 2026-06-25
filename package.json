@@ -1,0 +1,74 @@
+{
+  "name": "claude-uidevkit",
+  "version": "0.1.0",
+  "description": "Dev-only in-app overlay: click an element (or drag a box) in your running Next.js app to bundle full context for Claude Code, then fix it with the /claude-uidevkit slash command.",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "devtool",
+    "nextjs",
+    "react",
+    "ui",
+    "overlay",
+    "screenshot",
+    "dx"
+  ],
+  "license": "MIT",
+  "author": "Luis Fernando Lara Saldarriaga",
+  "type": "module",
+  "bin": {
+    "claude-uidevkit": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "bunchee",
+    "dev": "bunchee --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bunchee"
+  },
+  "peerDependencies": {
+    "html-to-image": ">=1.11",
+    "next": ">=14",
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "html-to-image": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "bunchee": "^6.11.0",
+    "html-to-image": "^1.11.13",
+    "next": "^16.2.9",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "typescript": "^6.0.3"
+  }
+}
